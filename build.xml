@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="wcv-publisher" basedir="." default="build">
+
+    <property name="builddir" location="${basedir}/build" />
+    <property name="distdir" location="${basedir}/dist" />
+
+    <property name="wcv.dir" location="${builddir}/wcv" />
+    <property name="wcv.repo" value="svn://kore-nordmann.de/wcv/trunk" />
+
+    <property name="archive.name" value="wcvp.phar" />
+    <property name="archive.alias" value="${archive.name}" />
+    <property name="archive.file" location="${distdir}/${archive.name}" />
+    <property name="archive.stub" location="${basedir}/conf/stub.php" />
+
+    <target name="build"
+            depends="prepare, export, phar"
+            description="->  Makes a clean export and creates PHAR archive" />
+
+    <target name="clean"
+            description="->  Removes all previous build artifacts and directories.">
+        <delete dir="${builddir}" />
+        <delete includeemptydirs="true" removeNotFollowedSymlinks="true">
+            <fileset dir="${basedir}">
+                <exclude name=".git/**" />
+                <exclude name="build.xml" />
+                <exclude name="conf/*.*" />
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="prepare" 
+            depends="clean"
+            description="->  Initializes the required build environment.">
+        <mkdir dir="${builddir}" />
+        <mkdir dir="${distdir}" />
+    </target>
+
+    <target name="export" depends="export-init, export-strip" />
+
+    <target name="export-init">
+        <exec executable="svn" dir="${basedir}">
+            <arg value="export" />
+            <arg value="${wcv.repo}" />
+            <arg value="${wcv.dir}" />
+        </exec>
+    </target>
+
+    <target name="export-strip">
+        <delete dir="${wcv.dir}/classes/ezc/scripts" />
+        <delete dir="${wcv.dir}/content" />
+        <delete dir="${wcv.dir}/config" />
+        <delete dir="${wcv.dir}/doc" />
+        <delete dir="${wcv.dir}/htdocs" />
+        <delete dir="${wcv.dir}/log" />
+        <delete dir="${wcv.dir}/tests" />
+        <delete dir="${wcv.dir}/var" />
+       
+        <delete file="${wcv.dir}/runTests" />
+    </target>
+
+    <target name="phar">
+        <exec executable="phar" dir="${basedir}" failonerror="true">
+            <arg value="pack" />
+            <arg value="-f" />
+            <arg value="${archive.file}" />
+            <arg value="-a" />
+            <arg value="${archive.alias}" />
+            <arg value="-s" />
+            <arg value="${archive.stub}" />
+            <arg value="-h" />
+            <arg value="sha512" />
+            <arg value="-c" />
+            <arg value="bz2" />
+            <arg value="${wcv.dir}" />
+        </exec>
+        <chmod file="${archive.file}" perm="755" />
+
+        <copy file="${wcv.dir}/LICENSE"
+              tofile="${distdir}/LICENSE.wcv" />
+    </target>
+    
+</project>
