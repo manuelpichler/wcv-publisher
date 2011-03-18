@@ -22,6 +22,7 @@
         <delete includeemptydirs="true" removeNotFollowedSymlinks="true">
             <fileset dir="${basedir}">
                 <exclude name=".git/**" />
+                <exclude name=".gitignore" />
                 <exclude name="build.xml" />
                 <exclude name="conf/*.*" />
                 <exclude name="README.rst" />
