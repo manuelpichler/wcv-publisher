@@ -24,6 +24,7 @@
                 <exclude name=".git/**" />
                 <exclude name="build.xml" />
                 <exclude name="conf/*.*" />
+                <exclude name="README.rst" />
             </fileset>
         </delete>
     </target>
